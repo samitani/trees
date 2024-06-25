@@ -17,6 +17,22 @@ CREATE TABLE `files` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 ```
 
+# LOAD DATA
+```
+$ head file.list
+/boot/config-5.14.0-362.13.1.el9_3.x86_64
+/boot/initramfs-0-rescue-85910d4004fd41118b0848a7286b94ec.img
+/boot/initramfs-5.14.0-362.13.1.el9_3.x86_64.img
+/boot/System.map-5.14.0-362.13.1.el9_3.x86_64
+/boot/vmlinuz-0-rescue-85910d4004fd41118b0848a7286b94ec
+/boot/vmlinuz-5.14.0-362.13.1.el9_3.x86_64
+/boot/.vmlinuz-5.14.0-362.13.1.el9_3.x86_64.hmac
+/etc/adjtime
+/etc/aliases
+
+$ cat file.list | sort | python adjacency_list.py
+```
+
 # SQL Sample
 
 ## SELECT all files
