@@ -2,19 +2,19 @@
 ```
 CREATE TABLE `directories` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_bin NOT NULL,
   `parent_directory_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_name_parent_directory_id` (`name`,`parent_directory_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE `files` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `directory_id` int DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `directory_id` int NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_directory_id` (`directory_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  UNIQUE KEY `idx_directory_id_name` (`directory_id`,`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=221243 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 ```
 
 # LOAD DATA
