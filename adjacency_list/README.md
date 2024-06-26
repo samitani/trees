@@ -2,10 +2,10 @@
 ```
 CREATE TABLE `directories` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `parent_directory_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_name_parent_directory_id` (`name`,`parent_directory_id`)
+  UNIQUE KEY `idx_name_parent_directory_id` (`name`,`parent_directory_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE `files` (
