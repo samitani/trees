@@ -29,7 +29,7 @@ $ cat file.list | sort | python materialized.py
 
 # SQL Sample
 
-## SELECT all files
+## SELECT all files without ORDER BY
 ```
 mysql> SELECT id, path, filename, created FROM files WHERE filename IS NOT NULL;
 +--------+------------------------+-----------------------------------------------------------------------------------+---------------------+

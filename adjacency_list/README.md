@@ -37,7 +37,7 @@ $ cat file.list | sort | python adjacency_list.py
 
 # SQL Sample
 
-## SELECT all files ORDER BY path
+## SELECT all files without ORDER BY
 ```
 mysql> WITH RECURSIVE DirectoryPaths AS (
     ->     -- 初期条件: ルートディレクトリのパスを取得
