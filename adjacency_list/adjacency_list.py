@@ -50,8 +50,8 @@ try:
         print("path: " + path + " file name: " + file_name + " parent_id: " + str(directory_id))
 
         insert_file = """
-        INSERT INTO files (name, directory_id)
-        VALUES (%s, %s)
+        INSERT INTO files (name, created, directory_id)
+        VALUES (%s, DATE_ADD('2024-01-01 00:00:00', INTERVAL floor(rand()*3600*24*365) SECOND), %s)
         """
         cursor.execute(insert_file, (file_name, directory_id))
 

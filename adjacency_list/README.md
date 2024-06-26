@@ -61,6 +61,49 @@ FROM DirectoryPaths dp
 JOIN files f ON dp.directory_id = f.directory_id;
 ```
 
+## SELECT TOP recent created files
+```
+mysql> WITH RECURSIVE DirectoryPaths AS (
+    ->     SELECT d.id AS directory_id,
+    ->            d.parent_directory_id AS parent_directory_id,
+    ->            d.name AS directory_name,
+    ->            d.name AS directory_path,
+    ->            f.created AS created,
+    ->            f.name AS filename
+    ->     FROM directories d, (SELECT name, created, directory_id FROM files ORDER BY created DESC LIMIT 1000) f
+    ->     WHERE d.id = f.directory_id
+    ->     UNION ALL
+    ->     SELECT d.id AS directory_id,
+    ->            d.parent_directory_id AS parent_directory_id,
+    ->            d.name AS directory_name,
+    ->            CONCAT(d.name, '/', dp.directory_path) AS directory_path,
+    ->            dp.created AS created,
+    ->            dp.filename AS filename
+    ->     FROM directories d
+    ->     JOIN DirectoryPaths dp ON dp.parent_directory_id = d.id
+    -> )
+    -> SELECT * FROM DirectoryPaths WHERE directory_path LIKE '/%';
++--------------+---------------------+----------------+------------------------------------+---------------------+---------------------------------------------------------------------+
+| directory_id | parent_directory_id | directory_name | directory_path                     | created             | filename                                                            |
++--------------+---------------------+----------------+------------------------------------+---------------------+---------------------------------------------------------------------+
+|            1 |                NULL |                | /boot                              | 2024-12-29 21:19:08 | initramfs-0-rescue-85910d4004fd41118b0848a7286b94ec.img             |
+|            1 |                NULL |                | /proc/248                          | 2024-12-30 23:54:29 | sessionid                                                           |
+|            1 |                NULL |                | /proc/45                           | 2024-12-30 22:50:47 | cmdline                                                             |
+|            1 |                NULL |                | /proc/2                            | 2024-12-30 22:16:52 | sessionid                                                           |
+|            1 |                NULL |                | /proc/6                            | 2024-12-30 20:37:46 | timers                                                              |
+|            1 |                NULL |                | /proc/1056                         | 2024-12-30 19:01:52 | wchan                                                               |
+|            1 |                NULL |                | /proc/32                           | 2024-12-30 18:40:05 | stat                                                                |
+|            1 |                NULL |                | /proc/14                           | 2024-12-30 18:32:57 | personality                                                         |
+|            1 |                NULL |                | /proc/582                          | 2024-12-30 18:11:03 | oom_adj                                                             |
+|            1 |                NULL |                | /proc/16                           | 2024-12-30 17:50:48 | status                                                              |
+|            1 |                NULL |                | /proc/36                           | 2024-12-30 16:39:41 | setgroups                                                           |
+|            1 |                NULL |                | /proc/478                          | 2024-12-30 16:38:36 | statm                                                               |
+|            1 |                NULL |                | /proc/76                           | 2024-12-30 14:56:55 | schedstat                                                           |
+|            1 |                NULL |                | /proc/721                          | 2024-12-30 14:42:20 | ksm_merging_pages                                                   |
+|            1 |                NULL |                | /proc/582                          | 2024-12-30 13:41:27 | coredump_filter                                                     |
+|            1 |                NULL |                | /proc/74                           | 2024-12-30 12:27:31 | timerslack_ns                                                       |
+```
+
 ## SELECT parent directory paths of specific directory
 ```
 mysql> WITH RECURSIVE DirectoryPaths AS (
