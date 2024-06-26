@@ -13,7 +13,7 @@ try:
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
 
-    # ディレクトリとファイルの登録
+    # ディレクトリの登録
     directories_created = {}
 
     # ソート済みのファイルリストを STDIN から受け取る

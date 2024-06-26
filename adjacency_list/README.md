@@ -14,6 +14,7 @@ CREATE TABLE `files` (
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `directory_id` int NOT NULL,
   PRIMARY KEY (`id`),
+  KEY `idx_created` (`created`),
   UNIQUE KEY `idx_directory_id_name` (`directory_id`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 ```
