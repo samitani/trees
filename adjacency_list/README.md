@@ -37,7 +37,7 @@ $ cat file.list | sort | python adjacency_list.py
 
 # SQL Sample
 
-## SELECT all files
+## SELECT all files ORDER BY path
 ```
 mysql> WITH RECURSIVE DirectoryPaths AS (
     ->     -- 初期条件: ルートディレクトリのパスを取得
@@ -46,9 +46,7 @@ mysql> WITH RECURSIVE DirectoryPaths AS (
     ->            d.name AS directory_path
     ->     FROM directories d
     ->     WHERE d.parent_directory_id IS NULL
-    ->
     ->     UNION ALL
-    ->
     ->     -- 再帰ステップ: 子ディレクトリを取得してパスを結合
     ->     SELECT d.id AS directory_id,
     ->            d.name AS directory_name,
@@ -57,28 +55,65 @@ mysql> WITH RECURSIVE DirectoryPaths AS (
     ->     JOIN DirectoryPaths dp ON d.parent_directory_id = dp.directory_id
     -> )
     -> -- 最終的にファイルのパスリストを生成
-    -> SELECT CONCAT(dp.directory_path, '/', f.name) AS file_path
+    -> SELECT f.id, CONCAT(dp.directory_path, '/', f.name) AS file_path, f.created
     -> FROM DirectoryPaths dp
     -> JOIN files f ON dp.directory_id = f.directory_id;
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-| file_path                                                                                                                                      |
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-| /.autorelabel                                                                                                                                  |
-| /boot/.vmlinuz-5.14.0-362.13.1.el9_3.x86_64.hmac                                                                                               |
-| /boot/System.map-5.14.0-362.13.1.el9_3.x86_64                                                                                                  |
-| /boot/config-5.14.0-362.13.1.el9_3.x86_64                                                                                                      |
-| /boot/initramfs-0-rescue-85910d4004fd41118b0848a7286b94ec.img                                                                                  |
-| /boot/initramfs-5.14.0-362.13.1.el9_3.x86_64.img                                                                                               |
-| /boot/vmlinuz-0-rescue-85910d4004fd41118b0848a7286b94ec                                                                                        |
-| /boot/vmlinuz-5.14.0-362.13.1.el9_3.x86_64                                                                                                     |
-| /etc/.pwd.lock                                                                                                                                 |
-| /etc/.updated                                                                                                                                  |
-| /etc/DIR_COLORS                                                                                                                                |
-| /etc/DIR_COLORS.lightbgcolor                                                                                                                   |
-| /etc/GREP_COLORS                                                                                                                               |
-| /etc/adjtime                                                                                                                                   |
-| /etc/aliases                                                                                                                                   |
-| /etc/anacrontab                                                                                                                                |
++--------+-------------------------------------------------------------------+---------------------+
+| id     | file_path                                                         | created             |
++--------+-------------------------------------------------------------------+---------------------+
+|      1 | /.autorelabel                                                     | 2024-01-28 07:37:10 |
+|      8 | /boot/.vmlinuz-5.14.0-362.13.1.el9_3.x86_64.hmac                  | 2024-04-15 02:08:02 |
+|      5 | /boot/System.map-5.14.0-362.13.1.el9_3.x86_64                     | 2024-04-08 00:29:18 |
+|      2 | /boot/config-5.14.0-362.13.1.el9_3.x86_64                         | 2024-01-17 04:02:07 |
+|      3 | /boot/initramfs-0-rescue-85910d4004fd41118b0848a7286b94ec.img     | 2024-12-29 21:19:08 |
+|      4 | /boot/initramfs-5.14.0-362.13.1.el9_3.x86_64.img                  | 2024-11-06 22:29:20 |
+|      6 | /boot/vmlinuz-0-rescue-85910d4004fd41118b0848a7286b94ec           | 2024-10-14 06:58:31 |
+|      7 | /boot/vmlinuz-5.14.0-362.13.1.el9_3.x86_64                        | 2024-02-17 09:24:43 |
+|    245 | /etc/.pwd.lock                                                    | 2024-03-17 03:17:57 |
+|    382 | /etc/.updated                                                     | 2024-07-22 12:19:34 |
+|     43 | /etc/DIR_COLORS                                                   | 2024-01-17 22:48:11 |
+|     44 | /etc/DIR_COLORS.lightbgcolor                                      | 2024-07-15 10:44:03 |
+|     69 | /etc/GREP_COLORS                                                  | 2024-03-25 01:44:49 |
+<snip>
++--------+-------------------------------------------------------------------+---------------------+
+221242 rows in set (2.37 sec)
+```
+
+## SELECT all files ORDER BY path
+```
+mysql> WITH RECURSIVE DirectoryPaths AS (
+    ->     SELECT d.id AS directory_id,
+    ->            d.name AS directory_name,
+    ->            d.name AS directory_path
+    ->     FROM directories d
+    ->     WHERE d.parent_directory_id IS NULL
+    ->     UNION ALL
+    ->     SELECT d.id AS directory_id,
+    ->            d.name AS directory_name,
+    ->            CONCAT(dp.directory_path, '/', d.name) AS directory_path
+    ->     FROM directories d
+    ->     JOIN DirectoryPaths dp ON d.parent_directory_id = dp.directory_id
+    -> )
+    -> SELECT CONCAT(dp.directory_path, '/', f.name) AS file_path, created
+    -> FROM DirectoryPaths dp
+    -> JOIN files f ON dp.directory_id = f.directory_id ORDER BY file_path;
++-------------------------------------------------------------------------------------------+---------------------+
+| file_path                                                                                 | created             |
++-------------------------------------------------------------------------------------------+---------------------+
+| /.autorelabel                                                                             | 2024-01-28 07:37:10 |
+| /boot/.vmlinuz-5.14.0-362.13.1.el9_3.x86_64.hmac                                          | 2024-04-15 02:08:02 |
+| /boot/System.map-5.14.0-362.13.1.el9_3.x86_64                                             | 2024-04-08 00:29:18 |
+| /boot/config-5.14.0-362.13.1.el9_3.x86_64                                                 | 2024-01-17 04:02:07 |
+| /boot/initramfs-0-rescue-85910d4004fd41118b0848a7286b94ec.img                             | 2024-12-29 21:19:08 |
+| /boot/initramfs-5.14.0-362.13.1.el9_3.x86_64.img                                          | 2024-11-06 22:29:20 |
+| /boot/vmlinuz-0-rescue-85910d4004fd41118b0848a7286b94ec                                   | 2024-10-14 06:58:31 |
+| /boot/vmlinuz-5.14.0-362.13.1.el9_3.x86_64                                                | 2024-02-17 09:24:43 |
+| /etc/.pwd.lock                                                                            | 2024-03-17 03:17:57 |
+| /etc/.updated                                                                             | 2024-07-22 12:19:34 |
+| /etc/DIR_COLORS                                                                           | 2024-01-17 22:48:11 |
+| /etc/DIR_COLORS.lightbgcolor                                                              | 2024-07-15 10:44:03 |
+| /etc/GREP_COLORS                                                                          | 2024-03-25 01:44:49 |
+| /etc/NetworkManager/NetworkManager.conf                                                   | 2024-06-27 17:29:31 |
 ```
 
 ## SELECT TOP recent created files
