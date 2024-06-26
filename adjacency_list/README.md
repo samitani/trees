@@ -38,27 +38,46 @@ $ cat file.list | sort | python adjacency_list.py
 
 ## SELECT all files
 ```
-WITH RECURSIVE DirectoryPaths AS (
-    -- 初期条件: ルートディレクトリのパスを取得
-    SELECT d.id AS directory_id,
-           d.name AS directory_name,
-           d.name AS directory_path
-    FROM directories d
-    WHERE d.parent_directory_id IS NULL
-    
-    UNION ALL
-    
-    -- 再帰ステップ: 子ディレクトリを取得してパスを結合
-    SELECT d.id AS directory_id,
-           d.name AS directory_name,
-           CONCAT(dp.directory_path, '/', d.name) AS directory_path
-    FROM directories d
-    JOIN DirectoryPaths dp ON d.parent_directory_id = dp.directory_id
-)
--- 最終的にファイルのパスリストを生成
-SELECT CONCAT(dp.directory_path, '/', f.name) AS file_path
-FROM DirectoryPaths dp
-JOIN files f ON dp.directory_id = f.directory_id;
+mysql> WITH RECURSIVE DirectoryPaths AS (
+    ->     -- 初期条件: ルートディレクトリのパスを取得
+    ->     SELECT d.id AS directory_id,
+    ->            d.name AS directory_name,
+    ->            d.name AS directory_path
+    ->     FROM directories d
+    ->     WHERE d.parent_directory_id IS NULL
+    ->
+    ->     UNION ALL
+    ->
+    ->     -- 再帰ステップ: 子ディレクトリを取得してパスを結合
+    ->     SELECT d.id AS directory_id,
+    ->            d.name AS directory_name,
+    ->            CONCAT(dp.directory_path, '/', d.name) AS directory_path
+    ->     FROM directories d
+    ->     JOIN DirectoryPaths dp ON d.parent_directory_id = dp.directory_id
+    -> )
+    -> -- 最終的にファイルのパスリストを生成
+    -> SELECT CONCAT(dp.directory_path, '/', f.name) AS file_path
+    -> FROM DirectoryPaths dp
+    -> JOIN files f ON dp.directory_id = f.directory_id;
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| file_path                                                                                                                                      |
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| /.autorelabel                                                                                                                                  |
+| /boot/.vmlinuz-5.14.0-362.13.1.el9_3.x86_64.hmac                                                                                               |
+| /boot/System.map-5.14.0-362.13.1.el9_3.x86_64                                                                                                  |
+| /boot/config-5.14.0-362.13.1.el9_3.x86_64                                                                                                      |
+| /boot/initramfs-0-rescue-85910d4004fd41118b0848a7286b94ec.img                                                                                  |
+| /boot/initramfs-5.14.0-362.13.1.el9_3.x86_64.img                                                                                               |
+| /boot/vmlinuz-0-rescue-85910d4004fd41118b0848a7286b94ec                                                                                        |
+| /boot/vmlinuz-5.14.0-362.13.1.el9_3.x86_64                                                                                                     |
+| /etc/.pwd.lock                                                                                                                                 |
+| /etc/.updated                                                                                                                                  |
+| /etc/DIR_COLORS                                                                                                                                |
+| /etc/DIR_COLORS.lightbgcolor                                                                                                                   |
+| /etc/GREP_COLORS                                                                                                                               |
+| /etc/adjtime                                                                                                                                   |
+| /etc/aliases                                                                                                                                   |
+| /etc/anacrontab                                                                                                                                |
 ```
 
 ## SELECT TOP recent created files
