@@ -11,10 +11,11 @@ CREATE TABLE `directories` (
 CREATE TABLE `files` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `directory_id` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_directory_id_name` (`directory_id`,`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=221243 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 ```
 
 # LOAD DATA
